@@ -1,0 +1,20 @@
+<idea-plugin>
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.vcs</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="VCS Switcher" displayType="BALLOON" isLogByDefault="true"/>
+        <postStartupActivity implementation="com.aiworkspace.vcsswitch.startup.VcsSwitchStartupActivity"/>
+    </extensions>
+
+    <actions>
+        <action
+            id="io.github.soberw.vcsswitch.action.SwitchProjectVcsAction"
+            class="com.aiworkspace.vcsswitch.action.VcsSwitchAction"
+            text="Switch Project VCS"
+            description="Switch the active VCS mapping for the project root">
+            <add-to-group group-id="MainToolbarRight" anchor="last"/>
+            <add-to-group group-id="VcsGroup" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>

@@ -1,0 +1,21 @@
+# IDE
+.idea/
+*.iml
+out/
+
+# Gradle
+.gradle/
+.kotlin/
+build/
+
+# IntelliJ Platform sandbox/cache
+.intellijPlatform/
+
+# Local workflow metadata
+.omc/
+.spec-workflow/
+tasks/
+
+# OS
+Thumbs.db
+Desktop.ini
