@@ -1,6 +1,7 @@
 # VCS Switch
 
 [English](README.md)
+[README 同步清单](README.sync-checklist.md)
 
 一个 IntelliJ IDEA 插件，用于在同一项目根目录下检测到的 Git、SVN 等版本控制系统之间切换当前激活的 VCS 映射。
 
