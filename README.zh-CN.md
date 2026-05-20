@@ -29,6 +29,8 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat buildPlugin
 ```
 
+如果 Gradle 仍然无法自动识别 JDK 21，请先确认 `JAVA_HOME` 已指向一个可用的 JDK 21 安装目录，再执行命令。
+
 生成的插件包位于：
 
 `build/distributions/vcs-switch-0.1.0.zip`
