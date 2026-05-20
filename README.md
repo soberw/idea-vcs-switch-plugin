@@ -29,6 +29,8 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat buildPlugin
 ```
 
+If Gradle cannot find JDK 21 automatically, verify that `JAVA_HOME` points to a JDK 21 installation before running the command.
+
 The packaged plugin zip is generated at:
 
 `build/distributions/vcs-switch-0.1.0.zip`
