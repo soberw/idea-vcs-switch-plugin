@@ -1,5 +1,7 @@
 # VCS Switch
 
+[中文说明](README.zh-CN.md)
+
 An IntelliJ IDEA plugin for switching the active VCS mapping of the current project root between detected version control systems such as Git and SVN.
 
 ## Current Scope
