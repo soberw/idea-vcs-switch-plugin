@@ -5,6 +5,8 @@
 
 An IntelliJ IDEA plugin for switching the active VCS mapping of the current project root between detected version control systems such as Git and SVN.
 
+Current target compatibility: IntelliJ IDEA / IntelliJ Platform `2026.1.x` (build `261.*`).
+
 ## Current Scope
 
 - Detect Git and SVN markers in the project root when a project opens
@@ -34,7 +36,7 @@ If Gradle cannot find JDK 21 automatically, verify that `JAVA_HOME` points to a 
 
 The packaged plugin zip is generated at:
 
-`build/distributions/vcs-switch-0.1.0.zip`
+`build/distributions/vcs-switch-0.1.2.zip`
 
 ## Compatibility Verification
 
@@ -42,7 +44,25 @@ The packaged plugin zip is generated at:
 .\gradlew.bat verifyPlugin
 ```
 
-This project is configured to run the IntelliJ Plugin Verifier against the recommended IDE set for the targeted platform version.
+This project is configured to run the IntelliJ Plugin Verifier against the current target IDE only, which keeps local verification faster and matches the configured `2026.1.3` platform dependency.
+
+If the required verification IDE artifact is not cached yet, Gradle may download an isolated IntelliJ IDEA `2026.1.3` distribution for verification. It does not need to download JDK or Gradle when your local environment is already configured.
+
+To force Plugin Verifier to use your existing local IntelliJ IDEA installation instead of downloading an IDE artifact, pass a local path:
+
+```powershell
+.\gradlew.bat verifyPlugin -PpluginVerifierLocalIdePath="D:\path\to\IntelliJ IDEA 2026.1.3"
+```
+
+For daily local development, you can also create an untracked `gradle-local.properties` file in the project root:
+
+```properties
+pluginVerifierLocalIdePath=D:\\path\\to\\IntelliJ IDEA 2026.1.3
+org.gradle.java.home=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
+org.gradle.java.installations.paths=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
+```
+
+If `pluginVerifierLocalIdePath` is present there, `verifyPlugin` will prefer your local IDE installation automatically.
 
 ## Install Into Your Existing IDEA
 
@@ -51,7 +71,7 @@ This project is configured to run the IntelliJ Plugin Verifier against the recom
 3. Go to `Settings -> Plugins`
 4. Click the gear icon
 5. Choose `Install Plugin from Disk...`
-6. Select `build/distributions/vcs-switch-0.1.0.zip`
+6. Select `build/distributions/vcs-switch-0.1.2.zip`
 7. Restart IDEA
 
 ## Optional Sandbox Run
@@ -95,3 +115,41 @@ Optional signing environment variables:
 - `CERTIFICATE_CHAIN`
 - `PRIVATE_KEY`
 - `PRIVATE_KEY_PASSWORD`
+
+## CI/CD Publishing
+
+JetBrains Marketplace does not build your plugin from source like PyPI. The supported automated path is: your CI builds the plugin ZIP, then uploads it with `publishPlugin`.
+
+This repository includes a GitHub Actions workflow at `.github/workflows/publish.yml` that:
+
+- runs on manual dispatch
+- runs on tags matching `v*`
+- validates the Git tag version against `gradle.properties`
+- builds the plugin
+- verifies the plugin
+- uploads the ZIP as a GitHub Actions artifact
+- publishes it to JetBrains Marketplace
+
+Required GitHub repository secrets:
+
+- `PUBLISH_TOKEN`
+
+Optional signing secrets, if you extend the workflow to publish signed artifacts:
+
+- `CERTIFICATE_CHAIN`
+- `PRIVATE_KEY`
+- `PRIVATE_KEY_PASSWORD`
+
+Recommended release flow:
+
+1. Update `gradle.properties` version
+2. Commit and push to GitHub
+3. Create and push a matching tag, for example `v0.1.2`
+4. Let GitHub Actions build, verify, and publish automatically
+
+Manual setup on GitHub:
+
+1. Open `Settings -> Secrets and variables -> Actions`
+2. Add repository secret `PUBLISH_TOKEN`
+3. Open `Actions` and enable workflows if GitHub asks
+4. Use `Actions -> Publish Plugin -> Run workflow` for manual releases, or push a `v*` tag for automatic releases

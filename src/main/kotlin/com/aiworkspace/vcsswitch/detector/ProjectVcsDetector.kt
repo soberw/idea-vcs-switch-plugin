@@ -26,7 +26,7 @@ class ProjectVcsDetector(private val project: Project) {
 
     private fun resolveCurrentVcs(rootPath: Path): DetectedVcs? {
         val normalizedRoot = normalizePath(rootPath)
-        val mappingName = vcsManager.directoryMappings
+        val mappingName = vcsManager.getDirectoryMappings()
             .firstOrNull { mapping ->
                 val directory = mapping.directory
                 if (directory.isNullOrBlank()) {
@@ -37,7 +37,7 @@ class ProjectVcsDetector(private val project: Project) {
                 normalizePath(mappedDirectory) == normalizedRoot
             }
             ?.vcs
-            ?: vcsManager.directoryMappings.firstOrNull { it.isDefaultMapping }?.vcs
+            ?: vcsManager.getDirectoryMappings().firstOrNull { it.isDefaultMapping }?.vcs
             ?: project.guessProjectDir()?.let(vcsManager::getVcsFor)?.name
 
         return DetectedVcs.fromMappingName(mappingName)

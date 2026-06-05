@@ -5,6 +5,8 @@
 
 一个 IntelliJ IDEA 插件，用于在同一项目根目录下检测到的 Git、SVN 等版本控制系统之间切换当前激活的 VCS 映射。
 
+当前目标兼容范围：IntelliJ IDEA / IntelliJ Platform `2026.1.x`（build `261.*`）。
+
 ## 当前范围
 
 - 在项目打开时检测项目根目录下的 Git 和 SVN 标记
@@ -34,7 +36,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 
 生成的插件包位于：
 
-`build/distributions/vcs-switch-0.1.0.zip`
+`build/distributions/vcs-switch-0.1.2.zip`
 
 ## 兼容性校验
 
@@ -42,7 +44,25 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat verifyPlugin
 ```
 
-项目已配置 IntelliJ Plugin Verifier，会针对目标平台版本推荐的 IDE 集合执行兼容性校验。
+项目已配置 IntelliJ Plugin Verifier，默认只校验当前目标 IDE，这样本地验证更快，也与当前配置的 `2026.1.3` 平台依赖保持一致。
+
+如果本地还没有对应的校验 IDE 缓存，Gradle 可能会额外下载一份独立的 IntelliJ IDEA `2026.1.3` 校验发行包。只要你的本地环境已经配置好，它不会再去下载 JDK 或 Gradle。
+
+如果你希望 Plugin Verifier 直接使用你当前已经安装的 IntelliJ IDEA，而不是下载校验 IDE 包，可以这样执行：
+
+```powershell
+.\gradlew.bat verifyPlugin -PpluginVerifierLocalIdePath="D:\path\to\IntelliJ IDEA 2026.1.3"
+```
+
+日常本地开发时，也可以在项目根目录创建一个不入库的 `gradle-local.properties` 文件：
+
+```properties
+pluginVerifierLocalIdePath=D:\\path\\to\\IntelliJ IDEA 2026.1.3
+org.gradle.java.home=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
+org.gradle.java.installations.paths=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
+```
+
+只要这个文件里存在 `pluginVerifierLocalIdePath`，`verifyPlugin` 就会默认优先使用你的本机 IDEA 安装目录。
 
 ## 安装到你当前的 IDEA
 
@@ -51,7 +71,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 3. 进入 `Settings -> Plugins`
 4. 点击右上角齿轮图标
 5. 选择 `Install Plugin from Disk...`
-6. 选择 `build/distributions/vcs-switch-0.1.0.zip`
+6. 选择 `build/distributions/vcs-switch-0.1.2.zip`
 7. 重启 IDEA
 
 ## 可选的沙盒运行
@@ -95,3 +115,41 @@ $env:PUBLISH_TOKEN="your_marketplace_token"
 - `CERTIFICATE_CHAIN`
 - `PRIVATE_KEY`
 - `PRIVATE_KEY_PASSWORD`
+
+## CI/CD 自动发布
+
+JetBrains Marketplace 本身不像 PyPI 那样直接基于源码仓库构建插件。官方支持的自动化路径是：由你的 CI 先构建插件 ZIP，再通过 `publishPlugin` 上传。
+
+当前仓库已补充 `.github/workflows/publish.yml`，支持：
+
+- 手动触发
+- 推送 `v*` tag 时触发
+- 自动校验 tag 版本与 `gradle.properties` 中的版本号一致
+- 自动构建插件
+- 自动执行兼容性校验
+- 自动上传 ZIP 到 GitHub Actions 制品
+- 自动发布到 JetBrains Marketplace
+
+GitHub 仓库需要配置的 secrets：
+
+- `PUBLISH_TOKEN`
+
+如果你后续要把 workflow 扩展为发布签名插件，还可以额外配置：
+
+- `CERTIFICATE_CHAIN`
+- `PRIVATE_KEY`
+- `PRIVATE_KEY_PASSWORD`
+
+推荐发布流程：
+
+1. 更新 `gradle.properties` 中的版本号
+2. 提交并推送代码到 GitHub
+3. 创建并推送对应 tag，例如 `v0.1.2`
+4. 让 GitHub Actions 自动完成构建、校验和发布
+
+GitHub 侧需要手动做的配置：
+
+1. 打开 `Settings -> Secrets and variables -> Actions`
+2. 新增仓库 secret：`PUBLISH_TOKEN`
+3. 如果 GitHub 提示需要启用 Actions，先启用 workflow
+4. 手动发布时，进入 `Actions -> Publish Plugin -> Run workflow`；自动发布时，直接推送 `v*` tag

@@ -7,6 +7,7 @@ out/
 .gradle/
 .kotlin/
 build/
+gradle-local.properties
 
 # IntelliJ Platform sandbox/cache
 .intellijPlatform/

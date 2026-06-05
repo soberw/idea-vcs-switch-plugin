@@ -27,7 +27,7 @@ class VcsMappingSwitcher(private val project: Project) {
         val normalizedRoot = normalizePath(projectRoot)
 
         try {
-            val updatedMappings = vcsManager.directoryMappings
+            val updatedMappings = vcsManager.getDirectoryMappings()
                 .filterNot { mapping ->
                     mapping.isDefaultMapping || normalizePath(mapping.directory) == normalizedRoot
                 }

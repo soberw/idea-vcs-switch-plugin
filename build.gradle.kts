@@ -1,4 +1,5 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import java.util.Properties
 
 plugins {
     id("org.jetbrains.kotlin.jvm")
@@ -8,11 +9,24 @@ plugins {
 group = providers.gradleProperty("group").get()
 version = providers.gradleProperty("version").get()
 
+val localGradleProperties = Properties().apply {
+    val localFile = rootProject.file("gradle-local.properties")
+    if (localFile.isFile) {
+        localFile.inputStream().use(::load)
+    }
+}
+val pluginVerifierLocalIdePath = sequenceOf(
+    providers.gradleProperty("pluginVerifierLocalIdePath").orNull,
+    System.getenv("PLUGIN_VERIFIER_LOCAL_IDE_PATH"),
+    localGradleProperties.getProperty("pluginVerifierLocalIdePath"),
+)
+    .firstOrNull { !it.isNullOrBlank() }
+
 dependencies {
     testImplementation("junit:junit:4.13.2")
 
     intellijPlatform {
-        intellijIdeaCommunity("2025.1.4")
+        intellijIdea("2026.1.3")
         testFramework(TestFrameworkType.Platform)
     }
 }
@@ -31,16 +45,15 @@ intellijPlatform {
             </ul>
         """.trimIndent()
         changeNotes = """
-            <p>Initial public release.</p>
+            <p>2026.1 compatibility update.</p>
             <ul>
-              <li>Detect project-level Git and SVN repositories.</li>
-              <li>Switch the active VCS directory mapping from a toolbar action.</li>
-              <li>Notify after the IDEA refresh cycle completes.</li>
+              <li>Retarget the plugin to IntelliJ IDEA 2026.1.3.</li>
+              <li>Publish compatibility for IntelliJ Platform build 261.* (2026.1.x).</li>
             </ul>
         """.trimIndent()
         ideaVersion {
-            sinceBuild = "251"
-            untilBuild = "251.*"
+            sinceBuild = "261"
+            untilBuild = "261.*"
         }
         vendor {
             name = "soberw"
@@ -63,7 +76,11 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            recommended()
+            if (pluginVerifierLocalIdePath.isNullOrBlank()) {
+                current()
+            } else {
+                local(file(pluginVerifierLocalIdePath))
+            }
         }
     }
 }
