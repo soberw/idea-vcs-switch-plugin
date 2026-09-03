@@ -5,7 +5,7 @@
 
 一个 IntelliJ IDEA 插件，用于在同一项目根目录下检测到的 Git、SVN 等版本控制系统之间切换当前激活的 VCS 映射。
 
-当前目标兼容范围：IntelliJ IDEA / IntelliJ Platform `2026.1.x`（build `261.*`）。
+当前目标兼容范围：IntelliJ IDEA / IntelliJ Platform `2026.2.x`（build `262.*`）。
 
 ## 当前范围
 
@@ -36,7 +36,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 
 生成的插件包位于：
 
-`build/distributions/vcs-switch-0.1.2.zip`
+`build/distributions/vcs-switch-0.1.3.zip`
 
 ## 兼容性校验
 
@@ -44,20 +44,20 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat verifyPlugin
 ```
 
-项目已配置 IntelliJ Plugin Verifier，默认只校验当前目标 IDE，这样本地验证更快，也与当前配置的 `2026.1.3` 平台依赖保持一致。
+项目已配置 IntelliJ Plugin Verifier，默认只校验当前目标 IDE，这样本地验证更快，也与当前配置的 `2026.2.2` 平台依赖保持一致。
 
-如果本地还没有对应的校验 IDE 缓存，Gradle 可能会额外下载一份独立的 IntelliJ IDEA `2026.1.3` 校验发行包。只要你的本地环境已经配置好，它不会再去下载 JDK 或 Gradle。
+如果本地还没有对应的校验 IDE 缓存，Gradle 可能会额外下载一份独立的 IntelliJ IDEA `2026.2.2` 校验发行包。只要你的本地环境已经配置好，它不会再去下载 JDK 或 Gradle。
 
 如果你希望 Plugin Verifier 直接使用你当前已经安装的 IntelliJ IDEA，而不是下载校验 IDE 包，可以这样执行：
 
 ```powershell
-.\gradlew.bat verifyPlugin -PpluginVerifierLocalIdePath="D:\path\to\IntelliJ IDEA 2026.1.3"
+.\gradlew.bat verifyPlugin -PpluginVerifierLocalIdePath="D:\path\to\IntelliJ IDEA 2026.2.2"
 ```
 
 日常本地开发时，也可以在项目根目录创建一个不入库的 `gradle-local.properties` 文件：
 
 ```properties
-pluginVerifierLocalIdePath=D:\\path\\to\\IntelliJ IDEA 2026.1.3
+pluginVerifierLocalIdePath=D:\\path\\to\\IntelliJ IDEA 2026.2.2
 org.gradle.java.home=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 org.gradle.java.installations.paths=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 ```
@@ -71,7 +71,7 @@ org.gradle.java.installations.paths=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 3. 进入 `Settings -> Plugins`
 4. 点击右上角齿轮图标
 5. 选择 `Install Plugin from Disk...`
-6. 选择 `build/distributions/vcs-switch-0.1.2.zip`
+6. 选择 `build/distributions/vcs-switch-0.1.3.zip`
 7. 重启 IDEA
 
 ## 可选的沙盒运行
@@ -144,7 +144,7 @@ GitHub 仓库需要配置的 secrets：
 
 1. 更新 `gradle.properties` 中的版本号
 2. 提交并推送代码到 GitHub
-3. 创建并推送对应 tag，例如 `v0.1.2`
+3. 创建并推送对应 tag，例如 `v0.1.3`
 4. 让 GitHub Actions 自动完成构建、校验和发布
 
 GitHub 侧需要手动做的配置：

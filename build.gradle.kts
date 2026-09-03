@@ -26,7 +26,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
 
     intellijPlatform {
-        intellijIdea("2026.1.3")
+        intellijIdea("2026.2.2")
         testFramework(TestFrameworkType.Platform)
     }
 }
@@ -45,15 +45,15 @@ intellijPlatform {
             </ul>
         """.trimIndent()
         changeNotes = """
-            <p>2026.1 compatibility update.</p>
+            <p>2026.2 compatibility update.</p>
             <ul>
-              <li>Retarget the plugin to IntelliJ IDEA 2026.1.3.</li>
-              <li>Publish compatibility for IntelliJ Platform build 261.* (2026.1.x).</li>
+              <li>Retarget the plugin to IntelliJ IDEA 2026.2.2.</li>
+              <li>Publish compatibility for IntelliJ Platform build 262.* (2026.2.x).</li>
             </ul>
         """.trimIndent()
         ideaVersion {
-            sinceBuild = "261"
-            untilBuild = "261.*"
+            sinceBuild = "262"
+            untilBuild = "262.*"
         }
         vendor {
             name = "soberw"
