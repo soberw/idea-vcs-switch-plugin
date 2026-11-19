@@ -5,7 +5,7 @@
 
 一个 IntelliJ IDEA 插件，用于在同一项目根目录下检测到的 Git、SVN 等版本控制系统之间切换当前激活的 VCS 映射。
 
-当前目标兼容范围：IntelliJ IDEA / IntelliJ Platform `2026.2.x`（build `262.*`）。
+当前目标兼容范围：IntelliJ IDEA / IntelliJ Platform `2026.1` 至 `2026.3.x`（build `261` 至 `263.*`）。
 
 ## 当前范围
 
@@ -36,7 +36,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 
 生成的插件包位于：
 
-`build/distributions/vcs-switch-0.1.3.zip`
+`build/distributions/vcs-switch-0.1.4.zip`
 
 ## 兼容性校验
 
@@ -44,20 +44,24 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 .\gradlew.bat verifyPlugin
 ```
 
-项目已配置 IntelliJ Plugin Verifier，默认只校验当前目标 IDE，这样本地验证更快，也与当前配置的 `2026.2.2` 平台依赖保持一致。
+项目默认使用 IntelliJ Plugin Verifier 校验每个受支持平台世代的一个稳定版本：`2026.1`、`2026.2.5` 和 `2026.3`。插件以最低支持平台 `2026.1` 编译，避免误用仅在新版本中存在的 API。
 
-如果本地还没有对应的校验 IDE 缓存，Gradle 可能会额外下载一份独立的 IntelliJ IDEA `2026.2.2` 校验发行包。只要你的本地环境已经配置好，它不会再去下载 JDK 或 Gradle。
+这些校验可能下载多份独立的 IntelliJ IDEA 发行包并占用较多磁盘空间。如果只想校验一个远程 IDE 版本，可传入 `-PpluginVerifierIdeVersion`，例如：
+
+```powershell
+.\gradlew.bat verifyPlugin -PpluginVerifierIdeVersion="2026.3"
+```
 
 如果你希望 Plugin Verifier 直接使用你当前已经安装的 IntelliJ IDEA，而不是下载校验 IDE 包，可以这样执行：
 
 ```powershell
-.\gradlew.bat verifyPlugin -PpluginVerifierLocalIdePath="D:\path\to\IntelliJ IDEA 2026.2.2"
+.\gradlew.bat verifyPlugin -PpluginVerifierLocalIdePath="D:\path\to\IntelliJ IDEA 2026.3"
 ```
 
 日常本地开发时，也可以在项目根目录创建一个不入库的 `gradle-local.properties` 文件：
 
 ```properties
-pluginVerifierLocalIdePath=D:\\path\\to\\IntelliJ IDEA 2026.2.2
+pluginVerifierLocalIdePath=D:\\path\\to\\IntelliJ IDEA 2026.3
 org.gradle.java.home=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 org.gradle.java.installations.paths=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 ```
@@ -71,7 +75,7 @@ org.gradle.java.installations.paths=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 3. 进入 `Settings -> Plugins`
 4. 点击右上角齿轮图标
 5. 选择 `Install Plugin from Disk...`
-6. 选择 `build/distributions/vcs-switch-0.1.3.zip`
+6. 选择 `build/distributions/vcs-switch-0.1.4.zip`
 7. 重启 IDEA
 
 ## 可选的沙盒运行
@@ -125,10 +129,9 @@ JetBrains Marketplace 本身不像 PyPI 那样直接基于源码仓库构建插�
 - 手动触发
 - 推送 `v*` tag 时触发
 - 自动校验 tag 版本与 `gradle.properties` 中的版本号一致
-- 自动构建插件
-- 自动执行兼容性校验
-- 自动上传 ZIP 到 GitHub Actions 制品
-- 自动发布到 JetBrains Marketplace
+- 自动构建插件并将唯一 ZIP 上传为 GitHub Actions 制品
+- 通过独立矩阵任务在 IntelliJ IDEA `2026.1`、`2026.2.5` 和 `2026.3` 上校验同一 ZIP
+- 仅在全部校验成功后，将同一份已验证 ZIP 发布到 JetBrains Marketplace
 
 GitHub 仓库需要配置的 secrets：
 
@@ -144,7 +147,7 @@ GitHub 仓库需要配置的 secrets：
 
 1. 更新 `gradle.properties` 中的版本号
 2. 提交并推送代码到 GitHub
-3. 创建并推送对应 tag，例如 `v0.1.3`
+3. 创建并推送对应 tag，例如 `v0.1.4`
 4. 让 GitHub Actions 自动完成构建、校验和发布
 
 GitHub 侧需要手动做的配置：

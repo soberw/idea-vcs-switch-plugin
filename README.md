@@ -5,7 +5,7 @@
 
 An IntelliJ IDEA plugin for switching the active VCS mapping of the current project root between detected version control systems such as Git and SVN.
 
-Current target compatibility: IntelliJ IDEA / IntelliJ Platform `2026.2.x` (build `262.*`).
+Current target compatibility: IntelliJ IDEA / IntelliJ Platform `2026.1` through `2026.3.x` (builds `261` through `263.*`).
 
 ## Current Scope
 
@@ -36,7 +36,7 @@ If Gradle cannot find JDK 21 automatically, verify that `JAVA_HOME` points to a 
 
 The packaged plugin zip is generated at:
 
-`build/distributions/vcs-switch-0.1.3.zip`
+`build/distributions/vcs-switch-0.1.4.zip`
 
 ## Compatibility Verification
 
@@ -44,20 +44,24 @@ The packaged plugin zip is generated at:
 .\gradlew.bat verifyPlugin
 ```
 
-This project is configured to run the IntelliJ Plugin Verifier against the current target IDE only, which keeps local verification faster and matches the configured `2026.2.2` platform dependency.
+By default, the IntelliJ Plugin Verifier checks one stable release from every supported platform generation: `2026.1`, `2026.2.5`, and `2026.3`. The plugin is compiled against `2026.1`, the oldest supported platform, to prevent accidental use of newer-only APIs.
 
-If the required verification IDE artifact is not cached yet, Gradle may download an isolated IntelliJ IDEA `2026.2.2` distribution for verification. It does not need to download JDK or Gradle when your local environment is already configured.
+These checks may download several isolated IntelliJ IDEA distributions and consume significant disk space. To verify only one remote IDE version, pass `-PpluginVerifierIdeVersion`, for example:
+
+```powershell
+.\gradlew.bat verifyPlugin -PpluginVerifierIdeVersion="2026.3"
+```
 
 To force Plugin Verifier to use your existing local IntelliJ IDEA installation instead of downloading an IDE artifact, pass a local path:
 
 ```powershell
-.\gradlew.bat verifyPlugin -PpluginVerifierLocalIdePath="D:\path\to\IntelliJ IDEA 2026.2.2"
+.\gradlew.bat verifyPlugin -PpluginVerifierLocalIdePath="D:\path\to\IntelliJ IDEA 2026.3"
 ```
 
 For daily local development, you can also create an untracked `gradle-local.properties` file in the project root:
 
 ```properties
-pluginVerifierLocalIdePath=D:\\path\\to\\IntelliJ IDEA 2026.2.2
+pluginVerifierLocalIdePath=D:\\path\\to\\IntelliJ IDEA 2026.3
 org.gradle.java.home=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 org.gradle.java.installations.paths=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 ```
@@ -71,7 +75,7 @@ If `pluginVerifierLocalIdePath` is present there, `verifyPlugin` will prefer you
 3. Go to `Settings -> Plugins`
 4. Click the gear icon
 5. Choose `Install Plugin from Disk...`
-6. Select `build/distributions/vcs-switch-0.1.3.zip`
+6. Select `build/distributions/vcs-switch-0.1.4.zip`
 7. Restart IDEA
 
 ## Optional Sandbox Run
@@ -125,10 +129,9 @@ This repository includes a GitHub Actions workflow at `.github/workflows/publish
 - runs on manual dispatch
 - runs on tags matching `v*`
 - validates the Git tag version against `gradle.properties`
-- builds the plugin
-- verifies the plugin
-- uploads the ZIP as a GitHub Actions artifact
-- publishes it to JetBrains Marketplace
+- builds the plugin and uploads a single ZIP as a GitHub Actions artifact
+- verifies that same ZIP on IntelliJ IDEA `2026.1`, `2026.2.5`, and `2026.3` in separate matrix jobs
+- publishes the same verified ZIP to JetBrains Marketplace only after all checks succeed
 
 Required GitHub repository secrets:
 
@@ -144,7 +147,7 @@ Recommended release flow:
 
 1. Update `gradle.properties` version
 2. Commit and push to GitHub
-3. Create and push a matching tag, for example `v0.1.3`
+3. Create and push a matching tag, for example `v0.1.4`
 4. Let GitHub Actions build, verify, and publish automatically
 
 Manual setup on GitHub:

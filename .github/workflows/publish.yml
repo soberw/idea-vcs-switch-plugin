@@ -17,25 +17,25 @@ on:
     tags:
       - "v*"
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
 
     permissions:
       contents: read
 
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "21"
@@ -57,19 +57,92 @@ jobs:
       - name: Build plugin
         run: ./gradlew buildPlugin --console=plain
 
-      - name: Verify plugin
-        run: ./gradlew verifyPlugin --console=plain
+      - name: Prepare release artifact
+        shell: bash
+        run: |
+          FILE_VERSION="$(sed -n 's/^version = //p' gradle.properties)"
+          mkdir -p ci-artifacts
+          cp "build/distributions/vcs-switch-${FILE_VERSION}.zip" ci-artifacts/plugin.zip
 
       - name: Upload plugin artifact
         uses: actions/upload-artifact@v4
         with:
           name: vcs-switch-plugin
-          path: build/distributions/*.zip
+          path: ci-artifacts/plugin.zip
           if-no-files-found: error
+
+  verify:
+    name: Verify on IDEA ${{ matrix.idea-version }}
+    runs-on: ubuntu-latest
+    needs: build
+
+    strategy:
+      fail-fast: false
+      matrix:
+        idea-version:
+          - "2026.1"
+          - "2026.2.5"
+          - "2026.3"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Download plugin artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: vcs-switch-plugin
+          path: ci-artifacts
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Verify plugin
+        run: ./gradlew verifyPlugin --console=plain "-PpluginVerifierIdeVersion=${{ matrix.idea-version }}" "-PpluginArchivePath=ci-artifacts/plugin.zip"
+
+  publish:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - verify
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Download plugin artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: vcs-switch-plugin
+          path: ci-artifacts
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Publish plugin
         env:
           PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
           PLUGIN_CHANNEL: ${{ github.event.inputs.pluginChannel || 'default' }}
           PLUGIN_HIDDEN: ${{ github.event.inputs.pluginHidden || 'false' }}
-        run: ./gradlew publishPlugin --console=plain -PpluginChannel=$PLUGIN_CHANNEL -PpluginHidden=$PLUGIN_HIDDEN
+        run: ./gradlew publishPlugin --console=plain "-PpluginArchivePath=ci-artifacts/plugin.zip" "-PpluginChannel=${PLUGIN_CHANNEL}" "-PpluginHidden=${PLUGIN_HIDDEN}"

@@ -1,4 +1,6 @@
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.PublishPluginTask
+import org.jetbrains.intellij.platform.gradle.tasks.VerifyPluginTask
 import java.util.Properties
 
 plugins {
@@ -21,12 +23,15 @@ val pluginVerifierLocalIdePath = sequenceOf(
     localGradleProperties.getProperty("pluginVerifierLocalIdePath"),
 )
     .firstOrNull { !it.isNullOrBlank() }
+val pluginVerifierIdeVersion = providers.gradleProperty("pluginVerifierIdeVersion").orNull
+val pluginArchivePath = providers.gradleProperty("pluginArchivePath")
 
 dependencies {
     testImplementation("junit:junit:4.13.2")
 
     intellijPlatform {
-        intellijIdea("2026.2.2")
+        // Compile against the oldest supported platform so newer-only APIs cannot leak into the plugin binary.
+        intellijIdea("2026.1")
         testFramework(TestFrameworkType.Platform)
     }
 }
@@ -45,15 +50,15 @@ intellijPlatform {
             </ul>
         """.trimIndent()
         changeNotes = """
-            <p>2026.2 compatibility update.</p>
+            <p>Expanded IntelliJ IDEA compatibility.</p>
             <ul>
-              <li>Retarget the plugin to IntelliJ IDEA 2026.2.2.</li>
-              <li>Publish compatibility for IntelliJ Platform build 262.* (2026.2.x).</li>
+              <li>Support IntelliJ IDEA 2026.1 through 2026.3.</li>
+              <li>Verify compatibility against IntelliJ Platform builds 261, 262, and 263.</li>
             </ul>
         """.trimIndent()
         ideaVersion {
-            sinceBuild = "262"
-            untilBuild = "262.*"
+            sinceBuild = "261"
+            untilBuild = "263.*"
         }
         vendor {
             name = "soberw"
@@ -76,10 +81,15 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            if (pluginVerifierLocalIdePath.isNullOrBlank()) {
-                current()
-            } else {
+            if (!pluginVerifierLocalIdePath.isNullOrBlank()) {
                 local(file(pluginVerifierLocalIdePath))
+            } else if (!pluginVerifierIdeVersion.isNullOrBlank()) {
+                create("IU", pluginVerifierIdeVersion)
+            } else {
+                // Verify one stable release from every supported platform generation.
+                create("IU", "2026.1")
+                create("IU", "2026.2.5")
+                create("IU", "2026.3")
             }
         }
     }
@@ -90,6 +100,14 @@ kotlin {
 }
 
 tasks {
+    named<VerifyPluginTask>("verifyPlugin") {
+        pluginArchivePath.orNull?.let { archiveFile.set(layout.projectDirectory.file(it)) }
+    }
+
+    named<PublishPluginTask>("publishPlugin") {
+        pluginArchivePath.orNull?.let { archiveFiles.setFrom(layout.projectDirectory.file(it)) }
+    }
+
     wrapper {
         gradleVersion = "9.5.1"
     }
