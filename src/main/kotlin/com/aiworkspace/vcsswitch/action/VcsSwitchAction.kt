@@ -9,6 +9,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.impl.ActionButton
 import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.popup.JBPopupFactory
@@ -45,7 +46,7 @@ class VcsSwitchAction : DumbAwareAction() {
             }
         }
 
-        JBPopupFactory.getInstance()
+        val popup = JBPopupFactory.getInstance()
             .createActionGroupPopup(
                 "Switch Project VCS",
                 popupGroup,
@@ -53,7 +54,17 @@ class VcsSwitchAction : DumbAwareAction() {
                 JBPopupFactory.ActionSelectionAid.SPEEDSEARCH,
                 true,
             )
-            .showInBestPositionFor(e.dataContext)
+
+        // Anchor to the toolbar button (including events from its children), never to the mouse position.
+        val button = generateSequence(e.inputEvent?.component) { it.parent }
+            .filterIsInstance<ActionButton>()
+            .firstOrNull { it.isShowing }
+        if (button != null) {
+            popup.showUnderneathOf(button)
+        } else {
+            // Find Action and menu invocations may have no visible toolbar button to anchor to.
+            popup.showCenteredInCurrentWindow(project)
+        }
     }
 
     private fun createSwitchAction(
