@@ -36,7 +36,7 @@ $env:Path="$env:JAVA_HOME\bin;$env:Path"
 
 生成的插件包位于：
 
-`build/distributions/vcs-switch-0.1.4.zip`
+`build/distributions/vcs-switch-0.1.5.zip`
 
 ## 兼容性校验
 
@@ -75,7 +75,7 @@ org.gradle.java.installations.paths=D:\\developmentTools\\Java\\jdk\\jdk-21.0.11
 3. 进入 `Settings -> Plugins`
 4. 点击右上角齿轮图标
 5. 选择 `Install Plugin from Disk...`
-6. 选择 `build/distributions/vcs-switch-0.1.4.zip`
+6. 选择 `build/distributions/vcs-switch-0.1.5.zip`
 7. 重启 IDEA
 
 ## 可选的沙盒运行
@@ -147,7 +147,7 @@ GitHub 仓库需要配置的 secrets：
 
 1. 更新 `gradle.properties` 中的版本号
 2. 提交并推送代码到 GitHub
-3. 创建并推送对应 tag，例如 `v0.1.4`
+3. 创建并推送对应 tag，例如 `v0.1.5`
 4. 让 GitHub Actions 自动完成构建、校验和发布
 
 GitHub 侧需要手动做的配置：

@@ -36,7 +36,7 @@ If Gradle cannot find JDK 21 automatically, verify that `JAVA_HOME` points to a 
 
 The packaged plugin zip is generated at:
 
-`build/distributions/vcs-switch-0.1.4.zip`
+`build/distributions/vcs-switch-0.1.5.zip`
 
 ## Compatibility Verification
 
@@ -75,7 +75,7 @@ If `pluginVerifierLocalIdePath` is present there, `verifyPlugin` will prefer you
 3. Go to `Settings -> Plugins`
 4. Click the gear icon
 5. Choose `Install Plugin from Disk...`
-6. Select `build/distributions/vcs-switch-0.1.4.zip`
+6. Select `build/distributions/vcs-switch-0.1.5.zip`
 7. Restart IDEA
 
 ## Optional Sandbox Run
@@ -147,7 +147,7 @@ Recommended release flow:
 
 1. Update `gradle.properties` version
 2. Commit and push to GitHub
-3. Create and push a matching tag, for example `v0.1.4`
+3. Create and push a matching tag, for example `v0.1.5`
 4. Let GitHub Actions build, verify, and publish automatically
 
 Manual setup on GitHub:

@@ -50,10 +50,11 @@ intellijPlatform {
             </ul>
         """.trimIndent()
         changeNotes = """
-            <p>Expanded IntelliJ IDEA compatibility.</p>
+            <p>Toolbar dropdown positioning fix.</p>
             <ul>
-              <li>Support IntelliJ IDEA 2026.1 through 2026.3.</li>
-              <li>Verify compatibility against IntelliJ Platform builds 261, 262, and 263.</li>
+              <li>Anchor the VCS selection popup below the toolbar button instead of the mouse cursor.</li>
+              <li>Center the popup in the project window when invoked without a visible toolbar button.</li>
+              <li>Support IntelliJ IDEA 2026.1 through 2026.3 (builds 261 through 263.*).</li>
             </ul>
         """.trimIndent()
         ideaVersion {
